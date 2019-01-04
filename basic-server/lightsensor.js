@@ -3,9 +3,7 @@ const mcpadc = require('mcp-spi-adc');
 const shell = require('shelljs');
 var V = -1
 var isInitialzed = false
-exports.value = function () {
-    return V
-}
+
 exports.read = function () {
 
     if (!isInitialzed) {

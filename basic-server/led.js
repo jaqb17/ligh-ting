@@ -15,10 +15,10 @@ board.on('ready', () => {
      console.log('board ready\n')
 
      exports.turnOn = function(){ 
-        _led.on()
+        _led.fadeIn(1000)
         _isOn = true }
      exports.turnOff = function(){
-        _led.off()
+        _led.fadeOut(500)
         _isOn = false }      
 })
 
