@@ -26,13 +26,13 @@ var firebaseapp = firebase.initializeApp({
 var databaseRef = firebaseapp.database().ref('/' + _id + '/')
 databaseRef.on('value', function (snapshot) {
 
-    if (snapshot.val().led == 'on') {
+
+
+    if (snapshot.val().led == 'true') {
         led.turnOn()
-    } else if (snapshot.val().led == 'off') {
+    } else if (snapshot.val().led == 'false') {
         led.turnOff()
-
     }
-
     _duskThreshold = snapshot.val().duskThreshold
     _turnOffTime.hour = snapshot.val().turnOffTime.hour
     _turnOffTime.minute = snapshot.val().turnOffTime.minute
@@ -43,14 +43,52 @@ databaseRef.on('value', function (snapshot) {
 })
 
 setInterval(function () {
-    if (lightsensor.read() < _duskThreshold) {
-        led.turnOn()
-        firebaseapp.database().ref('/' + _id + '/led').set('on')
-    } else {
-        led.turnOff()
-        firebaseapp.database().ref('/' + _id + '/led').set('off')
+
+    switch (_mode) {
+
+        case ModeEnum.DUSK_ONLY:
+            if (lightsensor.read() <= _duskThreshold) {
+                led.turnOn()
+                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+            } else {
+                led.turnOff()
+                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+            }
+            break
+
+        case ModeEnum.TIME_ONLY:
+            var hours = (new Date()).getHours();
+            var minutes = (new Date()).getMinutes();
+            if (hours == _turnOnTime.hour && minutes == _turnOnTime.minute) {
+                led.turnOn()
+                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+            }
+            if (hours == _turnOffTime.hour && minutes == _turnOffTime.minute) {
+                led.turnOff()
+                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+            }
+            break
+
+        case ModeEnum.DUSK_OVER_TIME:
+            var hours = (new Date()).getHours();
+            var minutes = (new Date()).getMinutes();
+            if (hours == _turnOnTime.hour && minutes == _turnOnTime.minute || lightsensor.read() <= _duskThreshold) {
+                led.turnOn()
+                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+            }
+            if (hours == _turnOffTime.hour && minutes == _turnOffTime.minute && lightsensor.read() > _duskThreshold) {
+                led.turnOff()
+                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+            }
+
+            break
+
+        case ModeEnum.OVERRIDE:
+            break
     }
+
     firebaseapp.database().ref('/' + _id + '/duskSensorReadings').set(lightsensor.read())
+
 }, _duskSensorReadInterval)
 
 
@@ -74,12 +112,12 @@ app.post('/led', (req, res) => {
     if (state == 1) {
         led.turnOn()
         res.send({ state: led.isOn() })
-        firebaseapp.database().ref('/' + _id + '/led').set('on')
+        firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
     }
     else if (state == 0) {
         led.turnOff()
         res.send({ state: led.isOn() })
-        firebaseapp.database().ref('/' + _id + '/led').set('off')
+        firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
     } else {
         res.sendStatus(400)
     }
