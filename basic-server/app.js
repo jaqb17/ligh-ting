@@ -8,11 +8,12 @@ const lightsensor = require('./lightsensor')
 const ModeEnum = { DUSK_ONLY: 'DUSK_ONLY', TIME_ONLY: 'TIME_ONLY', DUSK_OVER_TIME: 'DUSK_OVER_TIME', OVERRIDE: 'OVERRIDE' }
 
 const _id = 213
+var refDirectory = '/lights/'+_id+'/'
 var _duskThreshold = 200
 var _duskSensorReadInterval = 10000
 var _turnOffTime = { hour: 0, minute: 0 }
 var _turnOnTime = { hour: 0, minute: 0 }
-var _mode = ModeEnum.DUSK_ONLY
+var _mode = ModeEnum.OVERRIDE
 
 var firebaseapp = firebase.initializeApp({
     apiKey: "AIzaSyB9yMeGp9hyzhInZgDiCKi9ba1lT5orz30",
@@ -23,14 +24,14 @@ var firebaseapp = firebase.initializeApp({
     messagingSenderId: "131433570336"
 });
 
-var databaseRef = firebaseapp.database().ref('/' + _id + '/')
+var databaseRef = firebaseapp.database().ref(refDirectory)
 databaseRef.on('value', function (snapshot) {
 
+    console.log(snapshot.val().led)
 
-
-    if (snapshot.val().led == 'true') {
+    if (snapshot.val().led) {
         led.turnOn()
-    } else if (snapshot.val().led == 'false') {
+    } else if (!snapshot.val().led) {
         led.turnOff()
     }
     _duskThreshold = snapshot.val().duskThreshold
@@ -49,10 +50,10 @@ setInterval(function () {
         case ModeEnum.DUSK_ONLY:
             if (lightsensor.read() <= _duskThreshold) {
                 led.turnOn()
-                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+                firebaseapp.database().ref(refDirectory + 'led').set(led.isOn())
             } else {
                 led.turnOff()
-                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+                firebaseapp.database().ref(refDirectory + 'led').set(led.isOn())
             }
             break
 
@@ -61,11 +62,11 @@ setInterval(function () {
             var minutes = (new Date()).getMinutes();
             if (hours == _turnOnTime.hour && minutes == _turnOnTime.minute) {
                 led.turnOn()
-                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+                firebaseapp.database().ref(refDirectory + 'led').set(led.isOn())
             }
             if (hours == _turnOffTime.hour && minutes == _turnOffTime.minute) {
                 led.turnOff()
-                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+                firebaseapp.database().ref(refDirectory + 'led').set(led.isOn())
             }
             break
 
@@ -74,11 +75,11 @@ setInterval(function () {
             var minutes = (new Date()).getMinutes();
             if (hours == _turnOnTime.hour && minutes == _turnOnTime.minute || lightsensor.read() <= _duskThreshold) {
                 led.turnOn()
-                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+                firebaseapp.database().ref(refDirectory + 'led').set(led.isOn())
             }
             if (hours == _turnOffTime.hour && minutes == _turnOffTime.minute && lightsensor.read() > _duskThreshold) {
                 led.turnOff()
-                firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+                firebaseapp.database().ref(refDirectory + 'led').set(led.isOn())
             }
 
             break
@@ -87,7 +88,7 @@ setInterval(function () {
             break
     }
 
-    firebaseapp.database().ref('/' + _id + '/duskSensorReadings').set(lightsensor.read())
+    firebaseapp.database().ref(refDirectory + 'duskSensorReadings').set(lightsensor.read())
 
 }, _duskSensorReadInterval)
 
@@ -112,12 +113,12 @@ app.post('/led', (req, res) => {
     if (state == 1) {
         led.turnOn()
         res.send({ state: led.isOn() })
-        firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+        firebaseapp.database().ref(refDirectory + 'led').set(led.isOn())
     }
     else if (state == 0) {
         led.turnOff()
         res.send({ state: led.isOn() })
-        firebaseapp.database().ref('/' + _id + '/led').set(led.isOn())
+        firebaseapp.database().ref(refDirectory + 'led').set(led.isOn())
     } else {
         res.sendStatus(400)
     }
@@ -140,17 +141,17 @@ app.get('/config', (req, res) => {
 
 app.post('/config', (req, res) => {
     _duskThreshold = req.body.duskThreshold
-    firebaseapp.database().ref('/' + _id + '/duskThreshold').set(_duskThreshold)
+    firebaseapp.database().ref(refDirectory + 'duskThreshold').set(_duskThreshold)
     _turnOffTime.hour = req.body.turnOffTime.hour
-    firebaseapp.database().ref('/' + _id + '/turnOffTime/hour').set(_turnOffTime.hour)
+    firebaseapp.database().ref(refDirectory + 'turnOffTime/hour').set(_turnOffTime.hour)
     _turnOffTime.minute = req.body.turnOffTime.minute
-    firebaseapp.database().ref('/' + _id + '/turnOffTime/minute').set(_turnOffTime.minute)
+    firebaseapp.database().ref(refDirectory + 'turnOffTime/minute').set(_turnOffTime.minute)
     _turnOnTime.hour = req.body.turnOnTime.hour
-    firebaseapp.database().ref('/' + _id + '/turnOnTime/hour').set(_turnOnTime.hour)
+    firebaseapp.database().ref(refDirectory + 'turnOnTime/hour').set(_turnOnTime.hour)
     _turnOnTime.minute = req.body.turnOnTime.minute
-    firebaseapp.database().ref('/' + _id + '/turnOnTime/minute').set(_turnOnTime.minute)
+    firebaseapp.database().ref(refDirectory + 'turnOnTime/minute').set(_turnOnTime.minute)
     _mode = req.body.mode
-    firebaseapp.database().ref('/' + _id + '/mode').set(_mode)
+    firebaseapp.database().ref(refDirectory + 'mode').set(_mode)
     res.send({
         duskThreshlod: _duskThreshold,
         turnOffTime: {
