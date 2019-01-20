@@ -1,7 +1,6 @@
 
 const mcpadc = require('mcp-spi-adc');
 const shell = require('shelljs');
-var V = -1
 var isInitialzed = false
 
 exports.read = function () {
@@ -11,12 +10,14 @@ exports.read = function () {
         shell.exec('sudo modprobe spi_bcm2835')
         isInitialzed = true
     }
+    var promise = new Promise((resolve, reject) => {
 
-    const tempSensor = mcpadc.openMcp3008(4, (err) => {
-        tempSensor.read((err, reading) => {
-            V = reading.rawValue         
-        });
-    });
-    return V
+        const tempSensor = mcpadc.openMcp3008(4, (err) => {
+            tempSensor.read((err, reading) => {
+                resolve(reading.rawValue)
+            })
+        })
+    })
+    return promise
 }
 
