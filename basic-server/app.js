@@ -1,5 +1,6 @@
 const express = require('express')
 const firebase = require('firebase');
+const path = require('path')
 const app = express()
 app.use(express.json())
 const led = require('./led')
@@ -100,7 +101,19 @@ setInterval(function () {
 
 
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname+ '/index.html'))
+})
 
+app.get('/css/materialize.min.css', (req, res) => {
+    res.sendFile(path.join(__dirname+ '/css/materialize.min.css'))
+})
+
+app.get('/js/materialize.min.js', (req, res) => {
+    res.sendFile(path.join(__dirname+ '/js/materialize.min.js'))
+})
+
+app.get('/js/axios.min.js', (req, res) => {
+    res.sendFile(path.join(__dirname+ '/js/axios.min.js'))
 })
 
 app.get('/led', (req, res) => {
