@@ -1,22 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Sample Site</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ligh-ting control panel</title>
     <link rel="stylesheet" href="css/materialize.min.css">
-    <style>
-        body { padding-top:50px; }
-    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body>
 
-    <div class="teal lighten-2">
-        <div class="teal lighten-2">
-            <h1>res.sendFile() Works!</h1>
+<body>
+    <!-- <nav>
+        <div class="nav-wrapper teal darken-3">
+            <a class="brand-logo center white-text">Ligh-ting Control Panel</a>
+        </div>
+    </nav> -->
+
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m5 l6 offset-m3 offset-l3 ">
+                <div class="card">
+                    <div class="card-image">
+                        <img src="images/bulb.png">
+                        <span class="card-title">Card Title</span>
+                        <button class="btn-floating btn-large halfway-fab waves-effect waves-light yellow">ON</button>
+                    </div>
+                    <div class="card-content yellow lighten-5">
+                        <h4>ID: 1</h4>
+                        <h1></h1>
+                        <div class="input-field">
+                            <input disabled value="123" id="duskReadings" type="number" min=0 max=1023>
+                            <label for="duskReadings">Dusk Readings</label>
+                        </div>
+
+
+
+                        <div class="input-field">
+                            <input id="duskThreshold" type="number" min=0 max=1023>
+                            <label for="duskThreshold">Dusk Threshold</label>
+                        </div>
+
+
+                        <div class="input-field">
+                            <select>
+                                <option value="" disabled selected>Choose your option</option>
+                                <option value="1">Option 1</option>
+                                <option value="2">Option 2</option>
+                                <option value="3">Option 3</option>
+                            </select>
+                            <label>Mode Select</label>
+                        </div>
+
+                        <div class="input-field">
+                                <input type="text" class="timepicker">
+                                <label>Turn On Time</label>
+                        </div>
+                       
+                        <div class="input-field">
+                                <input type="text" class="timepicker">
+                                <label>Turn Off Time</label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+
     <script type="text/javascript" src="js/materialize.min.js"></script>
-    <script type="text/javascript" src="js/axios.min.js"></script>
+    <script>
+        M.AutoInit()
+    </script>
 </body>
+
 </html>
