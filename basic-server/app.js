@@ -101,19 +101,27 @@ setInterval(function () {
 
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname+ '/index.html'))
+    res.sendFile(path.join(__dirname + '/index.html'))
 })
 
 app.get('/css/materialize.min.css', (req, res) => {
-    res.sendFile(path.join(__dirname+ '/css/materialize.min.css'))
+    res.sendFile(path.join(__dirname + '/css/materialize.min.css'))
 })
 
 app.get('/js/materialize.min.js', (req, res) => {
-    res.sendFile(path.join(__dirname+ '/js/materialize.min.js'))
+    res.sendFile(path.join(__dirname + '/js/materialize.min.js'))
+})
+
+app.get('/images/bulb.png', (req, res) => {
+    res.sendFile(path.join(__dirname + '/images/bulb.png'))
+})
+
+app.get('/images/bulb_off.png', (req, res) => {
+    res.sendFile(path.join(__dirname + '/images/bulb_off.png'))
 })
 
 app.get('/js/axios.min.js', (req, res) => {
-    res.sendFile(path.join(__dirname+ '/js/axios.min.js'))
+    res.sendFile(path.join(__dirname + '/js/axios.min.js'))
 })
 
 app.get('/led', (req, res) => {
@@ -122,8 +130,17 @@ app.get('/led', (req, res) => {
 
 app.get('/sensor', (req, res) => {
     lightsensor.read().then((result) => {
-    res.send({ sensorReadingValue: result })
+        res.send({ sensorReadingValue: result })
     })
+})
+
+app.get('/duskThreshold', (req, res) => {
+    res.send({ duskThreshold: _duskThreshold })
+})
+
+app.post('/duskThreshold', (req, res) => {
+    _duskThreshold = req.body.duskThreshold
+    firebaseapp.database().ref(refDirectory + 'duskThreshold').set(_duskThreshold)
 })
 
 app.post('/led', (req, res) => {
