@@ -124,6 +124,10 @@ app.get('/js/axios.min.js', (req, res) => {
     res.sendFile(path.join(__dirname + '/js/axios.min.js'))
 })
 
+app.get('/id', (req,res)=>{
+    res.send({id: _id})
+})
+
 app.get('/led', (req, res) => {
     res.send({ isOn: led.isOn() })
 })
