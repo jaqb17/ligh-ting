@@ -43,22 +43,22 @@
 
 
                         <div class="input-field">
-                            <select>
-                                <option value="" disabled selected>Choose your option</option>
-                                <option value="1">Option 1</option>
-                                <option value="2">Option 2</option>
-                                <option value="3">Option 3</option>
+                            <select id="modeSelect">
+                                <option value="DUSK_ONLY">Dusk only</option>
+                                <option value="TIME_ONLY">Time only</option>
+                                <option value="DUSK_OVER_TIME">Dusk over time</option>
+                                <option value="OVERRIDE">Override</option>
                             </select>
                             <label>Mode Select</label>
                         </div>
 
                         <div class="input-field">
-                            <input type="text" class="timepicker">
+                            <input id="turnOnTime" type="text" class="timepicker">
                             <label>Turn On Time</label>
                         </div>
 
                         <div class="input-field">
-                            <input type="text" class="timepicker">
+                            <input id="turnOffTime" type="text" class="timepicker">
                             <label>Turn Off Time</label>
                         </div>
 
@@ -121,7 +121,41 @@
             axios.post('/duskThreshold/', { duskThreshold: document.getElementById('duskThreshold').value })
         })
 
+        document.getElementById('modeSelect').addEventListener('change', () => {
+            axios.post('/mode/', { mode: document.getElementById('modeSelect').value })
+        })
 
+        axios.get('/mode/').then(response => {
+            document.getElementById('modeSelect').value = response.data.mode
+            M.AutoInit()
+        })
+
+
+
+
+        axios.get('/turnontime/').then(response => {
+            document.getElementById('turnOnTime').value = response.data.hour + ':' + response.data.minute
+            var elems = document.querySelectorAll('.timepicker');
+            var instances = M.Timepicker.init(elems, { twelveHour: false });
+        })
+
+        document.getElementById('turnOnTime').addEventListener('change', () => {
+            var timeArray = document.getElementById('turnOnTime').value.split(':')
+
+            axios.post('/turnontime/', { hour: timeArray[0], minute: timeArray[1] })
+        })
+
+        axios.get('/turnofftime/').then(response => {
+            document.getElementById('turnOffTime').value = response.data.hour + ':' + response.data.minute
+            var elems = document.querySelectorAll('.timepicker');
+            var instances = M.Timepicker.init(elems, { twelveHour: false });
+        })
+
+        document.getElementById('turnOffTime').addEventListener('change', () => {
+            var timeArray = document.getElementById('turnOffTime').value.split(':')
+
+            axios.post('/turnofftime/', { hour: timeArray[0], minute: timeArray[1] })
+        })
 
             // setInterval(function () {
             //     location.reload()

@@ -143,6 +143,16 @@ app.post('/duskThreshold', (req, res) => {
     firebaseapp.database().ref(refDirectory + 'duskThreshold').set(_duskThreshold)
 })
 
+app.get('/mode', (req, res) => {
+    res.send({ mode: _mode })
+})
+
+app.post('/mode', (req, res) => {
+    _mode = req.body.mode
+    firebaseapp.database().ref(refDirectory + 'mode').set(_mode)
+})
+
+
 app.post('/led', (req, res) => {
     const state = req.body.state
 
@@ -160,6 +170,28 @@ app.post('/led', (req, res) => {
     }
 })
 
+app.post('/turnontime', (req, res) => {
+    _turnOnTime.hour = req.body.hour
+    firebaseapp.database().ref(refDirectory + 'turnOnTime/hour').set(_turnOnTime.hour)
+    _turnOnTime.minute = req.body.minute
+    firebaseapp.database().ref(refDirectory + 'turnOnTime/minute').set(_turnOnTime.minute)
+})
+
+app.post('/turnofftime', (req, res) => {
+    _turnOffTime.hour = req.body.hour
+    firebaseapp.database().ref(refDirectory + 'turnOffTime/hour').set(_turnOffTime.hour)
+    _turnOffTime.minute = req.body.minute
+    firebaseapp.database().ref(refDirectory + 'turnOffTime/minute').set(_turnOffTime.minute)
+})
+
+app.get('/turnontime', (req, res) => {
+    res.send({ hour: _turnOnTime.hour, minute: _turnOnTime.minute })
+})
+
+app.get('/turnofftime', (req, res) => {
+    res.send({ hour: _turnOffTime.hour, minute: _turnOffTime.minute })
+})
+
 app.get('/config', (req, res) => {
     res.send({
         duskThreshlod: _duskThreshold,
@@ -175,32 +207,7 @@ app.get('/config', (req, res) => {
     })
 })
 
-app.post('/config', (req, res) => {
-    _duskThreshold = req.body.duskThreshold
-    firebaseapp.database().ref(refDirectory + 'duskThreshold').set(_duskThreshold)
-    _turnOffTime.hour = req.body.turnOffTime.hour
-    firebaseapp.database().ref(refDirectory + 'turnOffTime/hour').set(_turnOffTime.hour)
-    _turnOffTime.minute = req.body.turnOffTime.minute
-    firebaseapp.database().ref(refDirectory + 'turnOffTime/minute').set(_turnOffTime.minute)
-    _turnOnTime.hour = req.body.turnOnTime.hour
-    firebaseapp.database().ref(refDirectory + 'turnOnTime/hour').set(_turnOnTime.hour)
-    _turnOnTime.minute = req.body.turnOnTime.minute
-    firebaseapp.database().ref(refDirectory + 'turnOnTime/minute').set(_turnOnTime.minute)
-    _mode = req.body.mode
-    firebaseapp.database().ref(refDirectory + 'mode').set(_mode)
-    res.send({
-        duskThreshlod: _duskThreshold,
-        turnOffTime: {
-            hour: _turnOffTime.hour,
-            minute: _turnOffTime.minute
-        },
-        turnOnTime: {
-            hour: _turnOnTime.hour,
-            minute: _turnOnTime.minute
-        },
-        mode: _mode
-    })
-})
+
 
 
 
